@@ -1,0 +1,26 @@
+server:
+  port: 9093
+  servlet:
+    context-path: /eureka-client
+spring:
+  application:
+    name: eureka-client-ribbon
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+eurekaServer:
+  name: @eureka.server01.instance.hostname@
+  port: @eureka.server01.server.port@
+  username: @eureka.server01.security.username@
+  password: @eureka.server01.security.password@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eurekaServer.username}:${eurekaServer.password}@${eurekaServer.name}:${eurekaServer.port}/eureka
+#注册中心的客户端info信息配置
+info:
+  client:
+    name: ${spring.application.name}
+    port: ${server.port}
+

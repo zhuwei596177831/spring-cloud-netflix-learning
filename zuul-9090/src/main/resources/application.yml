@@ -1,0 +1,73 @@
+server:
+  port: 9090
+spring:
+  application:
+    name: zuul-9090
+eurekaServer:
+  name: @eureka.server01.instance.hostname@
+  port: @eureka.server01.server.port@
+  username: @eureka.server01.security.username@
+  password: @eureka.server01.security.password@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eurekaServer.username}:${eurekaServer.password}@${eurekaServer.name}:${eurekaServer.port}/eureka
+info:
+  client:
+    name: ${spring.application.name}
+    port: ${server.port}
+#忽略所有服务名方式访问，必须通过自定义的routes方式访问(直接ip:端口/contextPath/servletPath依然可以)
+#http://127.0.0.1:9090/hystrix-goods-9095/goods/findGoodsPageList?pageNum=1&pageSize=10 X
+#http://127.0.0.1:9090/zuul-goods/goods/findGoodsPageList?pageNum=1&pageSize=10 √
+#http://127.0.0.1:9095/goods/findGoodsPageList?pageNum=1&pageSize=10 √
+zuul:
+  #设置统一访问前缀
+  prefix: /api
+  ignored-services: '*'
+  routes:
+    #方式一
+    hystrix-goods-9095: /zuul-goods/**
+    #方式二
+    orders:
+      path: /zuul-orders/**
+      serviceId: openfeign-orders-9096
+      # 会过滤客户端请求中的和该配置项匹配的headers 默认过滤 Cookie,Set-Cookie,Authorization
+#      sensitiveHeaders: Cookie,Set-Cookie,Authorization
+#These simple url-routes do not get executed as a HystrixCommand, nor do they load-balance multiple URLs with Ribbon.
+#To achieve those goals, you can specify a serviceId with a static list of servers, as follows:
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000
+ribbon:
+  NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
+  listOfServers: http://127.0.0.1:9096,http://127.0.0.1:9095
+  ConnectTimeout: 3000
+  ReadTimeout: 6000
+  MaxTotalHttpConnections: 500
+  MaxConnectionsPerHost: 100
+#hystrix:
+#  command:
+#    openfeign-orders-9096:
+#      execution:
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 3000
+#    hystrix-goods-9095:
+#      execution:
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 3000
+
+#hystrix-goods-9095:
+#  ribbon:
+#    NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
+#    listOfServers: http://127.0.0.1:9095
+#    ConnectTimeout: 1000
+#    ReadTimeout: 3000
+#    MaxTotalHttpConnections: 500
+#    MaxConnectionsPerHost: 100
+#openfeign-orders-9096:

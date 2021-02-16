@@ -1,0 +1,56 @@
+server:
+  port: 9096
+  servlet:
+    context-path: /orders
+spring:
+  application:
+    name: openfeign-orders-9096
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/springcloud_order?serverTimezone=GMT
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: springcloud
+    password: springcloud
+    #enabled false后自定义的负载均衡策略会失效
+#  cloud:
+#    loadbalancer:
+#      ribbon:
+#        enabled: false
+eurekaServer:
+  name: @eureka.server02.instance.hostname@
+  port: @eureka.server02.server.port@
+  username: @eureka.server02.security.username@
+  password: @eureka.server02.security.password@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eurekaServer.username}:${eurekaServer.password}@${eurekaServer.name}:${eurekaServer.port}/eureka
+info:
+  client:
+    name: ${spring.application.name}
+    port: ${server.port}
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign_id
+  configuration:
+    map-underscore-to-camel-case: false
+pagehelper:
+  support-methods-arguments: true
+  offset-as-page-num: true
+logging:
+  level:
+    com.example.openfeign.learning.mapper: debug
+loadBalancer:
+  clientName: eureka-client-ribbon
+feign:
+  client:
+    config:
+      default:
+        #connectTimeout prevents blocking the caller due to the long server processing time.
+        connectTimeout: 2000
+        #readTimeout is applied from the time of connection establishment and is triggered
+        #when returning the response takes too long.
+        readTimeout: 2000
+  #开启FeignClient Fallback
+  hystrix:
+    enabled: true

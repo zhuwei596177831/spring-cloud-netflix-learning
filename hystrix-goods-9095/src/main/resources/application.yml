@@ -1,0 +1,44 @@
+server:
+  port: 9095
+  servlet:
+    context-path: /goods
+spring:
+  application:
+    name: hystrix-goods-9095
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/springcloud_goods?serverTimezone=GMT
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: springcloud
+    password: springcloud
+    #enabled false后自定义的负载均衡策略会失效
+#  cloud:
+#    loadbalancer:
+#      ribbon:
+#        enabled: false
+eurekaServer:
+  name: @eureka.server02.instance.hostname@
+  port: @eureka.server02.server.port@
+  username: @eureka.server02.security.username@
+  password: @eureka.server02.security.password@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eurekaServer.username}:${eurekaServer.password}@${eurekaServer.name}:${eurekaServer.port}/eureka
+info:
+  client:
+    name: ${spring.application.name}
+    port: ${server.port}
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign_id
+  configuration:
+    map-underscore-to-camel-case: false
+pagehelper:
+  support-methods-arguments: true
+  offset-as-page-num: true
+logging:
+  level:
+    com.example.hystrix.learning.mapper: debug
+loadBalancer:
+  clientName: eureka-client-ribbon
