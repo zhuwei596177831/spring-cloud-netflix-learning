@@ -63,7 +63,16 @@ public class GoodsController {
                     //是否给方法执行设置超时，默认为 true。
 //                    @HystrixProperty(name = "execution.timeout.enabled", value = "true"),
                     //方法执行超时时间，默认值是 1000，即 1秒
-                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000")
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000"),
+
+
+                    //配置说明：最近10秒内30个请求有21个失败了就会熔断  之后再慢慢恢复调用链路
+                    //熔断机制配置：请求次数阈值 默认 20  推荐计算方式 qps*时间窗口期*熔断失败率
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "30"),
+                    //熔断机制配置：失败率达到多少后熔断（错误百分比阈值） 默认 50
+                    @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "70"),
+                    //熔断机制配置：时间窗口期 默认5000
+                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "10000")
             }
             //线程池配置 线程池方式是继续java线程池方式实现的 无法精确控制QPS
 //            threadPoolProperties = {
